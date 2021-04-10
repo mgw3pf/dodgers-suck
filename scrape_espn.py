@@ -59,7 +59,8 @@ for game in games:
                     # PERFORM DISCORD MESSAGE SEND ACTION, DODGERS LOST
             response = "Dodgers won :("
             break
-response = "Dodgers do not play today"
+        response = "Dodgers game is not complete."
+response = "Dodgers do not play today."
 
 @client.event
 async def on_ready():
