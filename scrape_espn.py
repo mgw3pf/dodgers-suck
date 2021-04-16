@@ -35,11 +35,13 @@ data_end_stripped = data[:data.index(';window.espn.scoreboardSettings')]
 data_json_formatted = data_end_stripped[data.index('{'):]
 data_json = json.loads(data_json_formatted)
 response = ""
+dodgers_play_today = False
 #data_events = json.loads(data_json['events'][0])
 games = data_json['events']
 dodgers_home = False
 for game in games:
     if "Dodgers" in game['name']: # found the dodgers game
+        dodgers_play_today = True
         home_team_runs = game['competitions'][0]['competitors'][0]['score']
         away_team_runs = game['competitions'][0]['competitors'][1]['score']
         teams = game['name'].split(' at ')
@@ -60,7 +62,8 @@ for game in games:
             response = "Dodgers won :("
             break
         response = "Dodgers game is not complete."
-response = "Dodgers do not play today."
+if not dodgers_play_today:
+    response = "Dodgers do not play today."
 
 @client.event
 async def on_ready():
