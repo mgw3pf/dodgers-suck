@@ -5,6 +5,7 @@ import discord
 from dotenv import load_dotenv
 from pprint import pprint
 from bs4 import BeautifulSoup
+from discord.ext import commands
 import json
 
 headers = {
@@ -19,7 +20,7 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
-client = discord.Client()
+bot = commands.Bot(command_prefix="!")
 
 
 def scrape_espn():
@@ -29,7 +30,6 @@ def scrape_espn():
     rough_json_data = soup.find(text=re.compile("window.espn.scoreboardData"))
     return rough_json_data
 
-#site_json=json.loads(soup.text)
 data = scrape_espn()
 data_end_stripped = data[:data.index(';window.espn.scoreboardSettings')]
 data_json_formatted = data_end_stripped[data.index('{'):]
@@ -51,12 +51,12 @@ for game in games:
                 #print(game['status']['type']['completed'])
             if dodgers_home:
                 if home_team_runs < away_team_runs:
-                    response = "DODGERS LOST!"
+                    response = "Dodgers lost to the " + teams[0] + " by a score of " + str(away_team_runs) + " to " + str(home_team_runs) + "."
                     break
                     # PERFORM DISCORD MESSAGE SEND ACTION, DODGERS LOST
             else:
                 if away_team_runs < home_team_runs:
-                    response = "DODGERS LOST!"
+                    response = "Dodgers lost to the " + teams[1] + " by a score of " + str(home_team_runs) + " to " + str(away_team_runs) + "."
                     break
                     # PERFORM DISCORD MESSAGE SEND ACTION, DODGERS LOST
             response = "Dodgers won :("
@@ -65,24 +65,24 @@ for game in games:
 if not dodgers_play_today:
     response = "Dodgers do not play today."
 
-@client.event
+@bot.event
 async def on_ready():
-    for guild in client.guilds:
+    for guild in bot.guilds:
         if guild.name == GUILD:
             break
     print(
-        f'{client.user} is connected to the following guild:\n'
+        f'{bot.user} is connected to the following guild:\n'
         f'{guild.name}(id: {guild.id})'
     )
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
+@bot.command(name="diddodgerswin", help="Did the Dodgers win?")
+async def on_message(ctx):
+    #if message.author == bot.user:
+    #    return
     
-    await message.channel.send(response)
+    await ctx.send(response)
 
-client.run(TOKEN)
+bot.run(TOKEN)
 
         
 
